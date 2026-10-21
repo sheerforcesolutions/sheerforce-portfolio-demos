@@ -1,58 +1,20 @@
-<!doctype html>
-<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Automation Reliability Lab | Katherine Perron</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Automation Reliability Lab | Katherine Perron</title>
 <style>
-:root{font:16px/1.5 system-ui,sans-serif;color:#182943;background:#f1f5f9}*{box-sizing:border-box}body{margin:0}
-header{background:#17324e;color:#fff;padding:30px max(24px,calc((100vw - 1060px)/2))}h1{margin:0}
-main{max-width:1060px;margin:25px auto;padding:0 20px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.card{background:#fff;border:1px solid #d8e3ec;border-radius:14px;padding:23px;box-shadow:0 5px 20px #20344912}.wide{grid-column:1/-1}
-label{display:block;font-weight:650;margin:12px 0 3px}input,select{width:100%;padding:10px;font:inherit;border:1px solid #a7bccf;border-radius:8px}
-button{background:#106c9d;color:white;font:inherit;font-weight:700;border:0;border-radius:8px;padding:11px 15px;margin:12px 7px 0 0;cursor:pointer}
-button.secondary{background:#52677c}button:focus-visible,input:focus-visible{outline:3px solid #e4a526}
-small,.hint{color:#4d6075}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;border-bottom:1px solid #dfe7ee}th{background:#eff5f9}
-.good{color:#126140}.warn{color:#94600b}.bad{color:#a2212a}#log{max-height:280px;overflow:auto;background:#102338;color:#e2f2ff;padding:14px;border-radius:9px;font:13px/1.7 ui-monospace,monospace;white-space:pre-wrap}
-.stat{font-size:1.7rem;font-weight:800} .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:10px} @media(max-width:760px){main{grid-template-columns:1fr}.cols{grid-template-columns:1fr 1fr}}
-</style>
-<header><small style="color:#b1def3">KATHERINE PERRON · PORTFOLIO CASE STUDY</small><h1>Automation Reliability Lab</h1><p>Fictional lead-intake system · Validation, retries, duplicate prevention and operations visibility</p></header>
-<main>
-<section class="card"><h2>1. Submit lead</h2><p class="hint">Try invalid email, duplicate submission, or a simulated temporary CRM outage.</p>
-<label for="name">Name</label><input id="name" value="Taylor Morgan" maxlength="80">
-<label for="email">Email</label><input id="email" value="taylor@example.test" maxlength="100">
-<label for="service">Interest</label><select id="service"><option>Process audit</option><option>Customer support workflow</option><option>Appointment automation</option></select>
-<label for="requestId">Form submission ID</label><input id="requestId" value="lead-demo-001" maxlength="60">
-<label><input id="outage" type="checkbox" style="width:auto"> Simulate CRM connection outage</label>
-<button id="send">Process submission</button><button class="secondary" id="retry">Retry queued</button>
-<button class="secondary" id="reset">Reset lab</button>
-</section>
-<section class="card"><h2>2. Operations dashboard</h2><div class="cols">
-<div><div class="stat" id="received">0</div><small>Unique received</small></div>
-<div><div class="stat" id="sent">0</div><small>Delivered</small></div>
-<div><div class="stat" id="queued">0</div><small>Pending retry</small></div>
-</div><h3>Rules</h3><ul><li>Validate required fields before processing.</li><li>Use submission ID to prevent duplicates.</li><li>Queue transient failures; retry only when healthy.</li><li>Log every result for human review.</li></ul><p id="result" role="status" aria-live="polite">Ready for a sample request.</p></section>
-<section class="card wide"><h2>3. Audit trail</h2><div id="log" aria-live="polite">No activity yet.</div></section>
-<section class="card wide"><h2>Case-study boundary</h2><p>This deterministic simulation uses only browser memory and synthetic information. It sends no email, contacts no CRM, charges nothing, and has no integration to any SheerForce production system. It illustrates process mapping, idempotency, failure recovery and observability, not measured customer results.</p></section>
-</main>
+:root{color-scheme:dark;--bg:#08101d;--panel:#15243a;--line:#334761;--text:#edf6ff;--muted:#b8c8dc;--blue:#74d0ff;--ok:#a4f1d4;--warn:#ffe0a1}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top right,#173c5e,transparent 33%),var(--bg);color:var(--text);font:16px/1.55 system-ui,Segoe UI,Arial,sans-serif}a{color:var(--blue)}main{max-width:980px;margin:auto;padding:25px 20px 70px}.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.eyebrow{margin:40px 0 8px;color:var(--ok);text-transform:uppercase;letter-spacing:.13em;font-weight:700;font-size:.8rem}h1{font-size:clamp(2rem,5vw,3rem);line-height:1.14;margin:6px 0 16px}.muted,p{color:var(--muted)}.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.panel{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:22px;margin-top:24px}h2{margin:0 0 16px}label{display:block;font-weight:650;margin:12px 0 6px}input,select{width:100%;padding:12px 13px;border-radius:8px;border:1px solid #55718b;background:#071727;color:var(--text);font:inherit}input:focus,select:focus{outline:2px solid var(--blue)}.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.button{border:1px solid #51728d;border-radius:9px;padding:10px 14px;background:#1f3955;color:var(--text);font:inherit;font-weight:700;cursor:pointer}.button.main{background:var(--blue);color:#001c2f;border:0}.button:hover,.button:focus-visible{filter:brightness(1.15)}.stat{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:11px 0;gap:12px}.notice{border:1px solid #66788a;padding:13px 16px;border-radius:10px;color:var(--muted);margin-top:22px;font-size:.92rem}.status{font-weight:700;color:var(--ok)}.status.bad{color:var(--warn)}.check{display:flex;align-items:center;gap:9px}.check input{width:auto}.log{max-height:360px;min-height:140px;overflow:auto;list-style:none;margin:0;padding:0}.log li{border-bottom:1px solid var(--line);padding:10px 0;font-size:.9rem;overflow-wrap:anywhere}.time{color:var(--blue);font-variant-numeric:tabular-nums;margin-right:8px}.success{color:var(--ok)}.warning{color:var(--warn)}.small{font-size:.86rem}@media(max-width:750px){.grid{grid-template-columns:1fr}}
+</style></head><body><main><div class="top"><a href="index.html">← Portfolio</a><span class="small muted">Interactive prototype · In-memory simulation</span></div><div class="eyebrow">Project 02 / Workflow reliability</div><h1>Automation Reliability Lab</h1><p>Test a fictional lead-intake workflow. Try invalid inputs, duplicate identifiers, an unavailable CRM, retries, and recovery. All actions are local to this page.</p><div class="notice"><strong>Simulation only:</strong> No CRM requests, AI calls, messages, or external storage. Use fictional information; this page is not intended for personal or customer data.</div>
+<div class="grid"><section class="panel"><h2>Submit a fictional lead</h2><form id="leadForm" novalidate><label for="id">Lead reference ID</label><input id="id" placeholder="DEMO-001" value="DEMO-001" maxlength="32" required><label for="name">Fictional customer name</label><input id="name" placeholder="Example Customer" value="Example Customer" maxlength="100" required><label for="email">Example email</label><input id="email" type="email" placeholder="sample@example.com" value="sample@example.com" maxlength="120" required><label for="need">Service interest</label><select id="need"><option>Appointment request</option><option>General inquiry</option><option>Quote request</option></select><div class="row"><button class="button main" type="submit">Validate & process</button><button class="button" id="retry" type="button">Retry queued items</button><button class="button" id="reset" type="button">Reset simulation</button></div></form></section>
+<section class="panel"><h2>Simulation controls</h2><label class="check" for="crmDown"><input id="crmDown" type="checkbox"> Simulate CRM outage</label><p class="small muted">When enabled, valid submissions enter the retry queue instead of being processed.</p><div class="stat"><span>CRM state</span><span class="status" id="connection">Available</span></div><div class="stat"><span>Processed records</span><strong id="processed">0</strong></div><div class="stat"><span>Queued for retry</span><strong id="queued">0</strong></div><div class="stat"><span>Rejected duplicates</span><strong id="dupes">0</strong></div><div class="stat"><span>Rejected invalid inputs</span><strong id="invalid">0</strong></div><p id="message" role="status" aria-live="polite">Ready to process fictional examples.</p></section></div>
+<section class="panel"><h2>Event log</h2><p class="small">Shows what a support or implementation team would want to inspect when testing an intake workflow.</p><ol id="events" class="log" aria-live="polite"></ol></section>
 <script>
-"use strict";
-const $=id=>document.getElementById(id);
-let jobs=new Map(),events=[];
-function stamp(s){events.push("["+new Date().toLocaleTimeString()+"] "+s);$("log").textContent=events.slice().reverse().join("\n");}
-function render(){let rows=[...jobs.values()];$("received").textContent=rows.length;$("sent").textContent=rows.filter(x=>x.status==="delivered").length;$("queued").textContent=rows.filter(x=>x.status==="queued").length;}
-function setResult(s,cls){$("result").textContent=s;$("result").className=cls;}
-function validEmail(s){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);}
-$("send").addEventListener("click",()=>{
- const name=$("name").value.trim(),email=$("email").value.trim(),id=$("requestId").value.trim(),service=$("service").value;
- if(!name||!validEmail(email)||!id){stamp("VALIDATION FAILED: missing name/id or invalid email");setResult("Rejected: correct the required fields.","bad");return;}
- if(jobs.has(id)){stamp("DUPLICATE BLOCKED: "+id+" already recorded");setResult("Duplicate prevented; no second delivery.","warn");return;}
- const job={id,name,email,service,status:$("outage").checked?"queued":"delivered",attempts:1};jobs.set(id,job);
- stamp((job.status==="queued"?"TEMPORARY FAILURE; QUEUED: ":"DELIVERED (SIMULATED): ")+id);
- setResult(job.status==="queued"?"Delivery paused safely; retry after restoring connection.":"Recorded and delivered in simulation.",job.status==="queued"?"warn":"good");render();
-});
-$("retry").addEventListener("click",()=>{
- const pending=[...jobs.values()].filter(x=>x.status==="queued");
- if(!pending.length){stamp("RETRY: no queued jobs");setResult("Nothing to retry.","warn");return;}
- if($("outage").checked){pending.forEach(x=>{x.attempts++;stamp("RETRY FAILED: "+x.id+"; still queued");});setResult("Connection unavailable; jobs remain queued.","bad");return;}
- pending.forEach(x=>{x.attempts++;x.status="delivered";stamp("RETRY DELIVERED (SIMULATED): "+x.id);});setResult("Queued submissions delivered once.","good");render();
-});
-$("reset").addEventListener("click",()=>{jobs=new Map();events=[];$("log").textContent="No activity yet.";setResult("Lab reset.","");render();});
-</script></html>
+'use strict';
+let processed=new Map(),queue=new Map(),duplicates=0,invalid=0;const $=id=>document.getElementById(id),log=$('events');
+function eventLine(text,kind=''){let li=document.createElement('li'),time=document.createElement('span'),msg=document.createElement('span');time.className='time';time.textContent=new Date().toLocaleTimeString()+'  ';msg.textContent=text;msg.className=kind;li.append(time,msg);log.prepend(li)}
+function metrics(){ $('processed').textContent=processed.size;$('queued').textContent=queue.size;$('dupes').textContent=duplicates;$('invalid').textContent=invalid;let outage=$('crmDown').checked;$('connection').textContent=outage?'Unavailable (simulated)':'Available';$('connection').className='status'+(outage?' bad':'')}
+function message(text){$('message').textContent=text}
+function valid(data){if(!/^[A-Za-z0-9][A-Za-z0-9_-]{2,31}$/.test(data.id))return 'Reference ID must be 3–32 letters, numbers, dashes, or underscores.';if(data.name.trim().length<2)return 'Fictional customer name must have at least 2 characters.';if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))return 'Enter a correctly formatted example email address.';return ''}
+function process(data){if($('crmDown').checked){queue.set(data.id,data);eventLine('SIMULATED CRM OUTAGE: '+data.id+' queued for retry.','warning');message('CRM outage simulated; submission queued.');return}processed.set(data.id,data);eventLine('SUCCESS: '+data.id+' processed in the simulated CRM.','success');message('Processed locally: '+data.id+'. No external request was sent.')}
+$('leadForm').addEventListener('submit',e=>{e.preventDefault();let data={id:$('id').value.trim(),name:$('name').value.trim(),email:$('email').value.trim(),need:$('need').value};let err=valid(data);if(err){invalid++;eventLine('VALIDATION FAILED: '+err,'warning');message(err);metrics();return}if(processed.has(data.id)||queue.has(data.id)){duplicates++;eventLine('DUPLICATE BLOCKED: '+data.id,'warning');message('Duplicate ID blocked: '+data.id);metrics();return}eventLine('VALIDATED: '+data.id+' / '+data.need);process(data);metrics()});
+$('crmDown').addEventListener('change',()=>{eventLine($('crmDown').checked?'TEST CONTROL: CRM outage enabled.':'TEST CONTROL: CRM connection restored.');metrics()});
+$('retry').addEventListener('click',()=>{if(!queue.size){eventLine('RETRY: queue empty.');message('There are no queued submissions to retry.');return}if($('crmDown').checked){eventLine('RETRY DEFERRED: simulated CRM still unavailable.','warning');message('Restore CRM availability before retrying.');return}let count=0;for(const [id,data] of Array.from(queue)){queue.delete(id);if(!processed.has(id)){processed.set(id,data);count++;eventLine('RETRY SUCCESS: '+id+' processed.','success')}}metrics();message(count+' queued submission(s) processed after recovery.')});
+$('reset').addEventListener('click',()=>{processed.clear();queue.clear();duplicates=0;invalid=0;$('crmDown').checked=false;log.replaceChildren();metrics();eventLine('Simulation reset; in-memory state cleared.');message('Ready to process fictional examples.')});metrics();eventLine('Demo initialized. All actions are simulated.');
+</script></main></body></html>

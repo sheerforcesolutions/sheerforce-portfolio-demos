@@ -1,0 +1,35 @@
+PUBLISH YOUR PORTFOLIO USING GITHUB PAGES
+
+This ZIP contains a READY-TO-UPLOAD static website with both working demos.
+IMPORTANT: The two demo HTML files here were reconstructed from the earlier
+project briefs while your Windows desktop was offline. They are not the exact
+previously reviewed OneDrive originals. If you prefer the originals, substitute
+those files from OneDrive > Career > 09_Portfolio_Demos_Drafts.
+
+1. Open https://github.com/new and sign into your sheerforcesolutions account.
+2. Repository name: sheerforce-portfolio-demos.
+3. Set the visibility to PUBLIC. Do NOT pre-add a README.
+4. Click Create repository.
+5. On the new repository's home page, choose 'uploading an existing file'
+   (or Add file > Upload files).
+6. UNZIP this package. Upload THESE FOUR files together into the repository root:
+     index.html
+     01_Customer_Operations_Simulator.html
+     02_Automation_Reliability_Lab.html
+     README.md
+7. Commit the upload to main.
+8. Go to Settings > Pages > Build and deployment.
+9. Select 'Deploy from a branch', branch 'main', folder '/ (root)'. Save.
+10. Open the published URL supplied by GitHub Pages; verify both demo buttons.
+
+GITHUB REPOSITORY LINK (only after creation):
+  https://github.com/sheerforcesolutions/sheerforce-portfolio-demos
+
+EXPECTED LIVE PAGES LINKS (only after Pages is enabled and works):
+  https://sheerforcesolutions.github.io/sheerforce-portfolio-demos/
+  https://sheerforcesolutions.github.io/sheerforce-portfolio-demos/01_Customer_Operations_Simulator.html
+  https://sheerforcesolutions.github.io/sheerforce-portfolio-demos/02_Automation_Reliability_Lab.html
+
+DO NOT send these links as if already live. Test them after publishing.
+Do not upload API keys, customer data, private repository files, or SheerForce
+Voice code. Only this separate new public repository should be affected.
