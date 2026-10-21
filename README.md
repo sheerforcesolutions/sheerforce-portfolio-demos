@@ -1,38 +1,37 @@
-# Katherine Perron — Interactive Technology & Operations Portfolio
+# Katherine Perron: Interactive Technology & Operations Portfolio
 
-**Focus:** Public safety operations, technical training, implementation support, customer experience, and workflow reliability.
+**Focus:** AI voice products, public safety operations, implementation and training, customer experience, and workflow reliability.
 
-This repository is a small, public-facing portfolio of **browser-only demonstrations** informed by professional operational experience. **The packaged HTML demos are re-created standalone versions based on the earlier demo briefs, not byte-for-byte copies of the previously reviewed OneDrive originals.** The demos are fictional examples; they do **not** connect to production business or public-safety systems.
+This repository is a public portfolio of **browser-only demonstrations** based on my operational and product work. Every demo is an original, self-contained simulation using fictional businesses and data. None of them connect to production systems, and none of them contain private source code.
 
 ## Projects
 
 ### 1. Customer Operations Simulator
+File: [`01_Customer_Operations_Simulator.html`](01_Customer_Operations_Simulator.html) · [Case study](CASE_STUDY_01_Customer_Operations.md)
 
-File: [`01_Customer_Operations_Simulator.html`](01_Customer_Operations_Simulator.html)
+A fictional service-intake decision tree. It shows how an intake process separates routine requests (appointments, estimates) from situations that need a human or an urgent safety escalation.
 
-A fictional service-intake decision tree demonstrating how an intake process can distinguish ordinary requests (such as appointments and estimates) from situations needing human handoff or urgent safety escalation.
-
-**Demonstrates:** requirements thinking, customer journeys, decision rules, and escalation design.
+**Demonstrates:** requirements thinking, customer journeys, decision rules and escalation design.
 
 ### 2. Automation Reliability Lab
-
 File: [`02_Automation_Reliability_Lab.html`](02_Automation_Reliability_Lab.html)
 
-A fictional lead-intake process that illustrates input validation, duplicate-record protection, simulated service failure, retries, and event logging.
+A fictional lead-intake process that shows input validation, duplicate-record protection, a simulated service failure, retries and event logging.
 
-**Demonstrates:** workflow quality controls, exception handling, reliability thinking, and test scenarios.
+**Demonstrates:** workflow quality controls, exception handling, reliability thinking and test scenarios.
 
-## What these demos are—and are not
+### 3. SheerForce Voice: AI Phone Receptionist (public demo)
+File: [`03_SheerForce_Voice_Demo.html`](03_SheerForce_Voice_Demo.html) · [Case study](CASE_STUDY_03_SheerForce_Voice.md)
 
-- Self-contained HTML/JavaScript prototypes intended to run entirely in a browser.
-- They use simulated, non-sensitive inputs and are not connected to APIs, payment services, CRMs, or live 911 systems.
-- They are not evidence of a production deployment or independently coded software engineering work.
-- AI-assisted development tools were used to help produce these prototypes. Katherine directed the operational requirements, use cases, and review.
+A simulated phone call with an AI receptionist for a fictional pizzeria and a fictional heating and plumbing company. Next to the call, an "engine view" shows the order or service request, its current state, which guardrails fired, and a log of every action. The point: **the AI holds the conversation, and the rules engine owns every price, time and promise.**
 
-## Live demos
+**Demonstrates:** AI product design, state machines, read-back and confirmation logic, safe failure handling, emergency (911) rules and human handoff.
 
-Once GitHub Pages is enabled for the repository, open `index.html` at the repository's published Pages URL, then choose a demonstration. Make sure both demo HTML files are in the **same directory** as `index.html`. You may use these reconstructed versions or replace them with your original, previously reviewed OneDrive files after inspecting them.
+## What these demos are, and aren't
+- Self-contained HTML/JavaScript that runs entirely in your browser
+- Fictional, non-sensitive data, with no APIs, AI models, phone calls, payments, CRMs or 911 systems
+- Original simulations, **not** copies of SheerForce production code. Product source, prompts, integrations and customer data stay private.
+- Built with AI-assisted development tools. I set the operational requirements, use cases and rules, and reviewed the results.
 
-## Technical notes
-
-No build tools required. To test locally, open each `.html` file in a browser. Avoid adding secrets, contact records, real dispatch information, or private business source code to this public repository.
+## View the demos
+Open `index.html` from this repository's GitHub Pages site, or download any `.html` file and open it in a browser. No build step is needed.

@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Browser-only simulation of the SheerForce Voice AI phone receptionist design: the AI holds the conversation, a rules engine owns every fact and commitment.">
+<title>SheerForce Voice Demo | Katherine Perron</title>
+<style>
+:root{font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#13233b;background:#eff5fa;--navy:#102843;--blue:#126ca0;--line:#d5e0eb}
+*{box-sizing:border-box}body{margin:0}
+header{background:var(--navy);color:#fff;padding:28px max(20px,calc((100vw - 1140px)/2))}
+header h1{margin:4px 0 6px;font-size:clamp(1.6rem,4vw,2.2rem)}header p{margin:0;color:#c9def0;max-width:820px}
+.kicker{font-size:.8rem;letter-spacing:.14em;color:#8ce1d2;font-weight:700}
+.back{color:#b7dff4;font-size:.9rem;text-decoration:none}.back:hover{text-decoration:underline}
+main{max-width:1140px;margin:22px auto 40px;padding:0 16px}
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.tab{border:1px solid #a9bdcc;background:#fff;color:#13233b;border-radius:999px;padding:9px 16px;font:inherit;font-weight:650;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+.grid{display:grid;grid-template-columns:1.05fr 1fr;gap:18px}
+.card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:20px;box-shadow:0 5px 18px #1c365414;min-width:0}
+h2{margin:0 0 4px;font-size:1.2rem}h3{margin:18px 0 8px;font-size:1rem}
+.small{font-size:.88rem;color:#456074}
+.call{height:390px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:12px;background:#f7fafd;margin-top:10px}
+.msg{max-width:88%;padding:9px 13px;border-radius:14px;margin:7px 0;font-size:.95rem}
+.caller{background:#dbeaf7;margin-left:auto;border-bottom-right-radius:4px}
+.agent{background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px}
+.who{display:block;font-size:.72rem;font-weight:750;letter-spacing:.06em;color:#456074;margin-bottom:2px}
+.sys{font-size:.8rem;color:#5d7487;text-align:center;margin:8px 0;font-style:italic}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{border:1px solid #9cc3dd;background:#f2f8fd;color:#0d3b5e;border-radius:10px;padding:8px 12px;font:inherit;font-size:.9rem;cursor:pointer;text-align:left}
+.chip:hover{background:#e1effa}.chip.warn{border-color:#e7b4ae;background:#fff4f3;color:#7c211c}
+.chip:focus-visible,.tab:focus-visible,button:focus-visible{outline:3px solid #f3b02e;outline-offset:2px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.reset{background:none;border:1px solid #a9bdcc;border-radius:9px;padding:7px 12px;font:inherit;font-size:.88rem;cursor:pointer;color:#13233b}
+label.toggle{font-size:.88rem;display:flex;gap:6px;align-items:center;cursor:pointer}
+.states{display:flex;flex-wrap:wrap;gap:6px}
+.st{font-size:.72rem;font-weight:700;letter-spacing:.03em;padding:4px 8px;border-radius:7px;background:#eef3f8;color:#6d8396;border:1px solid transparent}
+.st.on{background:#126ca0;color:#fff}.st.bad.on{background:#a33a30}.st.done.on{background:#1f7a4d}
+table{width:100%;border-collapse:collapse;font-size:.9rem}td,th{padding:6px 4px;border-bottom:1px solid #e6edf3;text-align:left;vertical-align:top}
+td.num,th.num{text-align:right;white-space:nowrap}.mods{display:block;font-size:.8rem;color:#5d7487}
+.totals td{border:0;padding:3px 4px}.totals tr:last-child td{font-weight:750;border-top:1px solid #cfdbe6}
+.rule{border-left:4px solid #126ca0;background:#f2f8fd;padding:8px 11px;border-radius:0 9px 9px 0;font-size:.88rem;margin:6px 0}
+.rule.red{border-color:#a33a30;background:#fff4f3}.rule.green{border-color:#1f7a4d;background:#effaf4}
+.log{font:12.5px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;background:#0f1e31;color:#cfe6ff;border-radius:10px;padding:10px 12px;max-height:190px;overflow-y:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+.log .ok{color:#8ce1a8}.log .no{color:#ffab9f}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:.88rem}
+.box{border:1px solid #9cc3dd;border-radius:10px;padding:8px 11px;background:#f7fbff}.box b{display:block;font-size:.86rem}
+.arrow{color:#6d8396;font-weight:700}
+.full{grid-column:1/-1}
+ul.tight{margin:6px 0;padding-left:20px}ul.tight li{margin:3px 0}
+.pill{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 8px;border-radius:99px;background:#fff1c8;color:#644200}
+@media(max-width:860px){.grid{grid-template-columns:1fr}.call{height:330px}}
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="index.html">← Portfolio</a>
+  <div class="kicker" style="margin-top:10px">KATHERINE PERRON · PROJECT 03 · AI VOICE PRODUCT</div>
+  <h1>SheerForce Voice — Public Demo</h1>
+  <p>An AI phone receptionist for local businesses. The design rule: the AI holds the conversation, and a rules engine owns every price, time and promise. Click the caller's lines to run a call and watch the engine work.</p>
+</header>
+
+<main>
+  <div class="tabs" role="tablist" aria-label="Demo business">
+    <button class="tab" role="tab" id="tab-rest" aria-selected="true" data-mode="rest">🍕 Restaurant order line</button>
+    <button class="tab" role="tab" id="tab-home" aria-selected="false" data-mode="home">🔧 Home-services receptionist</button>
+  </div>
+
+  <div class="grid">
+    <section class="card" aria-labelledby="callTitle">
+      <h2 id="callTitle">Live call (simulated)</h2>
+      <p class="small" id="bizLine"></p>
+      <div class="call" id="call" aria-live="polite"></div>
+      <div class="chips" id="chips" aria-label="What the caller says next"></div>
+      <div class="row">
+        <button class="reset" id="reset">↺ Start a new call</button>
+        <label class="toggle" id="outageWrap"><input type="checkbox" id="outage"> Simulate a kitchen-system outage</label>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="engTitle">
+      <h2 id="engTitle">Engine view</h2>
+      <p class="small">What the system knows and enforces. The AI can only ask the engine to act; it cannot invent facts.</p>
+      <h3>State</h3>
+      <div class="states" id="states"></div>
+      <h3 id="recTitle">Order</h3>
+      <div id="record"></div>
+      <h3>Guardrails triggered</h3>
+      <div id="rules"><p class="small">None yet.</p></div>
+      <h3>Action log</h3>
+      <div class="log" id="log" aria-label="Action log"></div>
+    </section>
+
+    <section class="card full" aria-labelledby="howTitle">
+      <h2 id="howTitle">How it's built (in plain terms)</h2>
+      <div class="flow" style="margin:10px 0 14px">
+        <div class="box"><b>📞 Caller</b>phone line</div><span class="arrow">→</span>
+        <div class="box"><b>🗣️ Voice AI</b>listens, talks, picks an action</div><span class="arrow">→</span>
+        <div class="box"><b>⚙️ Rules engine</b>menu, prices, hours, service area, order state</div><span class="arrow">→</span>
+        <div class="box"><b>🔌 Adapters</b>POS, calendar, staff alerts</div><span class="arrow">→</span>
+        <div class="box"><b>📊 Owner dashboard</b>orders, requests, alerts</div>
+      </div>
+      <ul class="tight">
+        <li><b>No made-up facts.</b> Prices, totals and availability come from the engine, never from the AI's memory.</li>
+        <li><b>Corrections change the real record.</b> "Make it pepperoni on the whole pie" updates the stored order and bumps its version number.</li>
+        <li><b>Confirmation must match the latest read-back.</b> If anything changes after the read-back, the agent reads it back again before accepting a "yes."</li>
+        <li><b>Never fake success.</b> If the kitchen system fails, the order goes to staff and the caller hears the truth.</li>
+        <li><b>Safety first.</b> Allergies, complaints and requests for a person go to staff. A gas smell gets a "leave and call 911" instruction right away.</li>
+        <li><b>No card numbers on the call,</b> and no call recordings stored: just a structured outcome.</li>
+      </ul>
+      <p class="small" style="margin-top:14px"><span class="pill">Scope</span> This page is an original, self-contained simulation. It runs entirely in your browser with scripted lines and a small rules engine written for this demo. No AI model, phone call, network request or storage is used. The businesses, menu, prices and people are fictional. It is <b>not</b> SheerForce Voice production code, and it doesn't include the product's prompts, integrations, credentials or customer data.</p>
+    </section>
+  </div>
+</main>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const money = c => "$" + (c / 100).toFixed(2);
+
+/* ---------- Fictional data ---------- */
+const MENU = {
+  pizza:  { name: "Large pizza", price: 1800, topping: { whole: 200, half: 100 } },
+  knots:  { name: "Garlic knots", price: 600 },
+  soda:   { name: "Bottled soda", price: 250 }
+};
+const TAX_RATE = 0.08;
+const SERVICE_ZIPS = ["10501", "10502", "10503"];
+const WINDOWS = ["Tomorrow 8–11 AM", "Tomorrow 12–3 PM"];
+
+const REST_STATES = [
+  ["DRAFT",""],["NEEDS_INFO",""],["READ_BACK",""],["CONFIRMED","done"],
+  ["SENT_TO_KITCHEN","done"],["KITCHEN_FAILED","bad"],["HANDED_TO_STAFF","bad"]
+];
+const HOME_STATES = [
+  ["INTAKE",""],["AREA_CHECKED",""],["REQUEST_LOGGED","done"],["SCHEDULED","done"],
+  ["EMERGENCY_911","bad"],["HANDED_TO_STAFF","bad"]
+];
+
+let mode = "rest", S;
+
+/* ---------- Rendering helpers ---------- */
+function say(who, text) {
+  const d = document.createElement("div");
+  d.className = "msg " + who;
+  const w = document.createElement("span"); w.className = "who";
+  w.textContent = who === "caller" ? "CALLER" : "SHEERFORCE VOICE (AI)";
+  d.append(w, document.createTextNode(text));
+  $("call").append(d); $("call").scrollTop = 1e6;
+}
+function note(text) {
+  const d = document.createElement("div"); d.className = "sys"; d.textContent = text;
+  $("call").append(d); $("call").scrollTop = 1e6;
+}
+function log(action, ok, detail) {
+  const line = document.createElement("div");
+  const t = document.createElement("span"); t.className = ok ? "ok" : "no"; t.textContent = ok ? "✔ " : "✖ ";
+  line.append(t, document.createTextNode(action + (detail ? "  →  " + detail : "")));
+  $("log").append(line); $("log").scrollTop = 1e6;
+}
+function rule(text, tone) {
+  if (!S.rules.length) $("rules").innerHTML = "";
+  S.rules.push(text);
+  const d = document.createElement("div"); d.className = "rule " + (tone || ""); d.textContent = text;
+  $("rules").append(d);
+}
+function setState(s) { S.state = s; drawStates(); }
+function drawStates() {
+  const list = mode === "rest" ? REST_STATES : HOME_STATES;
+  $("states").innerHTML = "";
+  list.forEach(([n, k]) => {
+    const e = document.createElement("span");
+    e.className = "st " + k + (S.state === n ? " on" : "");
+    e.textContent = n.replace(/_/g, " ");
+    $("states").append(e);
+  });
+}
+
+/* ---------- Restaurant engine ---------- */
+function linePrice(it) {
+  if (it.key !== "pizza") return MENU[it.key].price;
+  return MENU.pizza.price + it.toppings.reduce((s, t) => s + MENU.pizza.topping[t.place === "whole" ? "whole" : "half"], 0);
+}
+function totals() {
+  const sub = S.items.reduce((s, it) => s + linePrice(it), 0);
+  const tax = Math.round(sub * TAX_RATE);
+  return { sub, tax, total: sub + tax };
+}
+function bump() {
+  S.rev++;
+  if (S.state === "READ_BACK") { setState("DRAFT"); rule("Order changed after the read-back. The old \"yes\" no longer counts; a new read-back is required.", ""); }
+}
+function placeLabel(p) { return p === "whole" ? "whole pie" : p === "left" ? "left half" : "right half"; }
+function readback() {
+  const t = totals();
+  const parts = S.items.map(it => it.key === "pizza"
+    ? "a large pizza with " + it.toppings.map(x => x.name + " on the " + placeLabel(x.place)).join(" and ")
+    : "one " + MENU[it.key].name.toLowerCase());
+  return "Here's your order: " + parts.join(", ") + ". Pickup for " + S.contact.name + " at " + S.contact.phone +
+         ". Your total with tax is " + money(t.total) + ". Is that right?";
+}
+function drawRest() {
+  $("recTitle").textContent = "Order · version " + S.rev + (S.readRev ? " · read back at version " + S.readRev : "");
+  if (!S.items.length) { $("record").innerHTML = '<p class="small">Empty order.</p>'; return; }
+  const t = totals();
+  let h = "<table><thead><tr><th>Item</th><th class='num'>Price</th></tr></thead><tbody>";
+  S.items.forEach(it => {
+    const mods = it.key === "pizza" ? it.toppings.map(x => x.name + " (" + placeLabel(x.place) + ")").join(", ") : "";
+    h += "<tr><td>" + MENU[it.key].name + (mods ? "<span class='mods'>" + mods + "</span>" : "") + "</td><td class='num'>" + money(linePrice(it)) + "</td></tr>";
+  });
+  h += "</tbody></table><table class='totals'><tr><td>Subtotal</td><td class='num'>" + money(t.sub) + "</td></tr>" +
+       "<tr><td>Tax (8%, sample)</td><td class='num'>" + money(t.tax) + "</td></tr>" +
+       "<tr><td>Total</td><td class='num'>" + money(t.total) + "</td></tr></table>" +
+       "<p class='small'>Pickup · " + (S.contact.name ? S.contact.name + " · " + S.contact.phone : "<i>name and callback number missing</i>") + "</p>";
+  $("record").innerHTML = h;
+}
+
+const REST_STEPS = {
+  order: {
+    label: "\"Large pizza: pepperoni on the left half, mushrooms on the whole thing.\"",
+    when: () => !S.items.length && !S.closed,
+    run() {
+      say("caller", "Hi, can I get a large pizza, pepperoni on the left half and mushrooms on the whole thing?");
+      S.items.push({ key: "pizza", toppings: [{ name: "pepperoni", place: "left" }, { name: "mushrooms", place: "whole" }] });
+      S.rev++; setState("NEEDS_INFO");
+      log("menu.lookup('large pizza')", true, "found · base " + money(MENU.pizza.price));
+      log("order.add_item(pizza, pepperoni:left, mushrooms:whole)", true, "version " + S.rev);
+      rule("Half-and-half is stored as data (left / right / whole), not just words, so the kitchen ticket and the price are correct.", "green");
+      say("agent", "Got it: a large pizza with pepperoni on the left half and mushrooms on the whole pie. That's " + money(linePrice(S.items[0])) + ". Anything else?");
+    }
+  },
+  fix: {
+    label: "\"Actually, put the pepperoni on the whole pizza.\"",
+    when: () => S.items.length && S.items[0].toppings[0].place === "left" && !S.closed,
+    run() {
+      say("caller", "Actually, can you put the pepperoni on the whole pizza?");
+      S.items[0].toppings[0].place = "whole"; bump();
+      log("order.update_item(pizza, pepperoni → whole)", true, "version " + S.rev);
+      say("agent", "No problem. Pepperoni on the whole pie now. The pizza is " + money(linePrice(S.items[0])) + ".");
+    }
+  },
+  knots: {
+    label: "\"And an order of garlic knots.\"",
+    when: () => S.items.length && !S.items.some(i => i.key === "knots") && !S.closed,
+    run() {
+      say("caller", "And an order of garlic knots.");
+      S.items.push({ key: "knots" }); bump();
+      log("order.add_item(garlic knots)", true, "version " + S.rev);
+      say("agent", "Garlic knots added. Is this for pickup or delivery?");
+    }
+  },
+  contact: {
+    label: "\"Pickup. It's Sam, 555-0142.\"",
+    when: () => S.items.length && !S.contact.name && !S.closed,
+    run() {
+      say("caller", "Pickup. My name's Sam, number is 555-0142.");
+      S.contact = { name: "Sam", phone: "555-0142" }; setState("DRAFT");
+      log("order.set_contact(pickup, Sam, 555-0142)", true, "required info complete");
+      say("agent", "Thanks, Sam. Anything else, or are you all set?");
+    }
+  },
+  done: {
+    label: "\"That's everything.\"",
+    when: () => S.items.length && S.state !== "READ_BACK" && !S.closed,
+    run() {
+      say("caller", "That's everything.");
+      if (!S.contact.name) {
+        log("order.prepare_read_back()", false, "blocked: missing name and callback number");
+        rule("The engine won't prepare a read-back until required details are collected.", "");
+        say("agent", "Almost done. Can I get a name and a callback number for the order?");
+        return;
+      }
+      S.readRev = S.rev; setState("READ_BACK");
+      log("order.prepare_read_back()", true, "read-back generated by the engine at version " + S.rev);
+      say("agent", readback());
+    }
+  },
+  soda: {
+    label: "\"Oh wait, add a soda too.\"",
+    when: () => S.state === "READ_BACK" && !S.items.some(i => i.key === "soda"),
+    run() {
+      say("caller", "Oh wait, add a soda too.");
+      S.items.push({ key: "soda" }); bump();
+      log("order.add_item(bottled soda)", true, "version " + S.rev + " (read-back was version " + S.readRev + ")");
+      say("agent", "Sure, a soda is on there. Let me read the whole order back again.");
+      S.readRev = S.rev; setState("READ_BACK");
+      log("order.prepare_read_back()", true, "new read-back at version " + S.rev);
+      say("agent", readback());
+    }
+  },
+  yes: {
+    label: "\"Yes, that's right.\"",
+    when: () => S.state === "READ_BACK",
+    run() {
+      say("caller", "Yes, that's right.");
+      if (S.readRev !== S.rev) { log("order.confirm(version " + S.readRev + ")", false, "rejected: order is now version " + S.rev); return; }
+      setState("CONFIRMED");
+      log("order.confirm(customer_confirmed=true, version " + S.rev + ")", true, "locked snapshot saved");
+      if ($("outage").checked) {
+        log("kitchen.send(order)", false, "kitchen system timeout (simulated)");
+        setState("KITCHEN_FAILED");
+        log("order.hand_to_staff(reason: kitchen system failed)", true, "staff alerted");
+        setState("HANDED_TO_STAFF");
+        rule("Never fake success: the order didn't reach the kitchen, so it goes to staff. No automatic resend, so the kitchen can't get a double order.", "red");
+        say("agent", "I've got your order, but our kitchen system didn't accept it just now. I've sent it to the staff, and someone will call you at 555-0142 in a few minutes to confirm. I don't want to tell you it's in when it isn't.");
+      } else {
+        log("kitchen.send(order)", true, "accepted · ticket #A-1042");
+        setState("SENT_TO_KITCHEN");
+        rule("The agent only says \"your order is in\" after the kitchen system accepts it.", "green");
+        say("agent", "You're all set, Sam. Your order is in, and the total is " + money(totals().total) + " at pickup. Thanks for calling!");
+      }
+      S.closed = true;
+    }
+  },
+  allergy: {
+    label: "⚠️ \"Is the pizza safe? I have a peanut allergy.\"",
+    warn: true,
+    when: () => !S.closed,
+    run() {
+      say("caller", "Is the pizza safe? I have a peanut allergy.");
+      log("safety.check(\"peanut allergy\")", true, "allergy topic: AI must not answer");
+      log("call.transfer_to_staff(reason: allergy)", true, "staff line ringing (simulated)");
+      setState("HANDED_TO_STAFF"); S.closed = true;
+      rule("Allergies are a staff decision. The AI never guesses about ingredients; it hands off with the order so far.", "red");
+      say("agent", "I want you to get an accurate answer on that, so I'm connecting you with a team member now. I'll pass along what you've ordered so far.");
+    }
+  },
+  card: {
+    label: "⚠️ \"Can I just pay now? My card is 4111 1111…\"",
+    warn: true,
+    when: () => S.items.length && !S.closed,
+    run() {
+      say("caller", "Can I just pay now? My card number is 4111 1111 …");
+      log("input.screen(free text)", false, "card number detected · not stored · not logged");
+      rule("Card numbers are refused on the call and never written to the order, logs or notes.", "red");
+      say("agent", "Please don't read your card number to me. For your security I can't take it over the phone. You can pay when you pick up.");
+    }
+  }
+};
+
+/* ---------- Home-services engine ---------- */
+function drawHome() {
+  $("recTitle").textContent = "Service request";
+  const r = S.req;
+  const row = (k, v) => "<tr><td>" + k + "</td><td>" + (v || "<i class='small'>—</i>") + "</td></tr>";
+  $("record").innerHTML = "<table>" + row("Issue", r.issue) + row("ZIP / area", r.zip ? r.zip + (r.inArea === false ? " (outside area)" : r.inArea ? " (in area)" : "") : "") +
+    row("Priority", r.priority) + row("Appointment", r.window || (r.priority ? "not booked" : "")) + row("Next step", r.next) + "</table>";
+}
+const HOME_STEPS = {
+  heat: {
+    label: "\"Hi, my heat stopped working.\"",
+    when: () => !S.req.issue && !S.closed,
+    run() {
+      say("caller", "Hi, my heat stopped working this morning.");
+      S.req.issue = "No heat"; S.req.priority = "Standard";
+      log("request.start(issue: no heat)", true, "intake opened");
+      say("agent", "I'm sorry, that's no fun. I can get someone out to you. What's the ZIP code there?");
+    }
+  },
+  zipIn: {
+    label: "\"10502.\"",
+    when: () => S.req.issue && !S.req.zip && !S.closed,
+    run() {
+      say("caller", "It's 10502.");
+      S.req.zip = "10502"; S.req.inArea = true; setState("AREA_CHECKED");
+      log("area.check(10502)", true, "inside service area");
+      say("agent", "Great, you're in our area. I have two openings: " + WINDOWS.join(" or ") + ". Which works better?");
+    }
+  },
+  zipOut: {
+    label: "\"I'm in 10999.\"",
+    when: () => S.req.issue && !S.req.zip && !S.closed,
+    run() {
+      say("caller", "I'm in 10999.");
+      S.req.zip = "10999"; S.req.inArea = false; S.req.next = "Office reviews coverage and calls back"; setState("REQUEST_LOGGED");
+      log("area.check(10999)", false, "outside service area");
+      log("request.log(needs office review)", true, "owner notified");
+      rule("Outside the service area: no visit is promised. The request is logged for the office to review.", "");
+      say("agent", "That ZIP is outside our usual service area, so I can't promise a visit. I've passed your request to the office, and they'll call you back today to see what they can do.");
+      S.closed = true;
+    }
+  },
+  book: {
+    label: "\"Tomorrow morning works.\"",
+    when: () => S.req.inArea && !S.req.window && !S.closed,
+    run() {
+      say("caller", "Tomorrow morning works.");
+      log("calendar.hold(" + WINDOWS[0] + ")", true, "window is open · booked");
+      S.req.window = WINDOWS[0]; S.req.next = "Technician visit"; setState("SCHEDULED");
+      rule("A time is only promised after the calendar confirms it's open.", "green");
+      say("agent", "You're booked for " + WINDOWS[0].toLowerCase() + ". You'll get a confirmation text, and the technician will call when they're on the way.");
+      S.closed = true;
+    }
+  },
+  gas: {
+    label: "⚠️ \"I smell gas near the furnace.\"",
+    warn: true,
+    when: () => !S.closed,
+    run() {
+      say("caller", "Wait, I smell gas near the furnace.");
+      S.req.issue = (S.req.issue ? S.req.issue + " + " : "") + "Gas smell"; S.req.priority = "EMERGENCY"; S.req.next = "Caller told to leave and call 911; on-call tech alerted";
+      log("safety.check(\"gas smell\")", true, "life-safety rule matched");
+      log("alert.on_call(priority: emergency)", true, "on-call technician paged (simulated)");
+      setState("EMERGENCY_911"); S.closed = true;
+      rule("Life safety comes before booking: the first sentence tells the caller to leave and call 911. No questions, no hold, no transfer delay.", "red");
+      say("agent", "Please leave the house now, don't use light switches or anything that could spark, and call 911 from outside. I've alerted our on-call technician about this. Please go now.");
+    }
+  },
+  person: {
+    label: "\"Can I talk to a real person?\"",
+    when: () => !S.closed,
+    run() {
+      say("caller", "Can I just talk to a real person?");
+      log("call.transfer_to_staff(reason: caller request)", true, "office line ringing (simulated)");
+      S.req.next = "Transferred to office"; setState("HANDED_TO_STAFF"); S.closed = true;
+      rule("If a caller asks for a person, they get one.", "");
+      say("agent", "Of course. I'm connecting you with the office now, and I'll pass along what you've told me so you don't have to repeat it.");
+    }
+  }
+};
+
+/* ---------- Controller ---------- */
+function steps() { return mode === "rest" ? REST_STEPS : HOME_STEPS; }
+function drawChips() {
+  $("chips").innerHTML = "";
+  const avail = Object.entries(steps()).filter(([, s]) => s.when());
+  avail.forEach(([k, s]) => {
+    const b = document.createElement("button");
+    b.className = "chip" + (s.warn ? " warn" : ""); b.textContent = s.label;
+    b.addEventListener("click", () => { s.run(); draw(); });
+    $("chips").append(b);
+  });
+  if (!avail.length) {
+    const p = document.createElement("p"); p.className = "small";
+    p.textContent = "Call ended. Start a new call to try a different path.";
+    $("chips").append(p);
+  }
+}
+function draw() { (mode === "rest" ? drawRest : drawHome)(); drawStates(); drawChips(); }
+function start() {
+  S = { state: mode === "rest" ? "DRAFT" : "INTAKE", rev: 0, readRev: 0, items: [], contact: {}, req: {}, rules: [], closed: false };
+  $("call").innerHTML = ""; $("log").innerHTML = ""; $("rules").innerHTML = '<p class="small">None yet.</p>';
+  $("outageWrap").style.display = mode === "rest" ? "flex" : "none";
+  if (mode === "rest") {
+    $("bizLine").textContent = "Fictional business: Riverside Test Kitchen · sample menu and prices";
+    note("Incoming call · answered on the first ring");
+    say("agent", "Thanks for calling Riverside Test Kitchen! I'm the virtual assistant. What can I get started for you?");
+    log("call.answer(business: riverside-test-kitchen)", true, "menu loaded from engine, not from the AI prompt");
+  } else {
+    $("bizLine").textContent = "Fictional business: Northgate Heating & Plumbing · sample service area " + SERVICE_ZIPS.join(", ");
+    note("Incoming call · answered on the first ring");
+    say("agent", "Thanks for calling Northgate Heating and Plumbing. If this is an emergency like a gas smell, tell me right away. How can I help?");
+    log("call.answer(business: northgate-heating)", true, "service area and hours loaded from engine");
+  }
+  draw();
+}
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
+  mode = t.dataset.mode;
+  document.querySelectorAll(".tab").forEach(x => x.setAttribute("aria-selected", x === t ? "true" : "false"));
+  start();
+}));
+$("reset").addEventListener("click", start);
+start();
+</script>
+</body>
+</html>

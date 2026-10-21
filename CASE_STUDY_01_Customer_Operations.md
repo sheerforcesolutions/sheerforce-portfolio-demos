@@ -1,9 +1,9 @@
 # Customer Operations Simulator
-## Portfolio case study — private draft for Katherine Perron
+## Portfolio case study, Katherine Perron
 
 **Role focus:** AI Solutions / Implementation, technical product thinking, customer operations
 **Format:** Standalone offline HTML/CSS/JavaScript demonstration
-**Release status:** Private review only; not connected to SheerForce production systems
+**Release status:** Public portfolio demo; not connected to SheerForce production systems
 
 ## The business problem
 When a small service business misses or mishandles calls, requests can be lost, urgent issues can be delayed, and customers may be given promises the business cannot keep. An AI-assisted front desk must distinguish routine intake from situations requiring human judgment.
@@ -20,7 +20,7 @@ The decision flow explicitly demonstrates:
 - A booking *request* distinguished from a booked appointment.
 
 ## Katherine's relevant real-world experience
-Katherine brings 21 years of NYPD emergency communications experience, including supervisory and command responsibilities, staffing and queue management, incident escalation, quality assurance, and training. The SheerForce Voice repository documents current work on AI-based telephone assistance, customer intake, business rules, and escalation design.
+Katherine brings 21 years of NYPD emergency communications experience, including supervisory and command responsibilities, staffing and queue management, incident escalation, quality assurance, and training. My SheerForce Voice product work (see Project 03) covers on AI-based telephone assistance, customer intake, business rules, and escalation design.
 
 This case study is an **illustration of those operating principles**, not an assertion that this standalone browser simulation was deployed to paying customers or integrated with phone services.
 
@@ -42,9 +42,3 @@ Five simulated input categories were exercised programmatically: routine booking
 - No calendar availability, CRM persistence, SMS, dispatch, or emergency-service integration.
 - No measured reduction in missed calls, response time, or costs.
 - Separate original simulation; it does not reveal or reproduce SheerForce Voice production code.
-
-## Next improvements before publication
-1. Add an architecture diagram showing the boundary between intake, policy decision, and external actions (as hypothetical integrations).
-2. Record a 30–45 second screen walkthrough.
-3. Add a small scenario test matrix, including missing name and out-of-coverage behavior.
-4. Confirm Katherine's exact contribution wording and professional title.
