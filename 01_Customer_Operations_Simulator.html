@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Customer Operations Simulator | Katherine Perron</title>
+<style>
+:root{font:16px/1.5 system-ui,sans-serif;color:#13233b;background:#eff5fa}*{box-sizing:border-box}body{margin:0}
+header{background:#102843;color:white;padding:30px max(24px,calc((100vw - 1020px)/2))}header h1{margin:0;font-size:2rem}
+main{max-width:1020px;margin:28px auto;padding:0 20px;display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.card{background:white;border:1px solid #d5e0eb;border-radius:15px;padding:23px;box-shadow:0 5px 18px #1c365414}h2{margin-top:0}
+label{display:block;font-weight:650;margin-top:14px}select,input,textarea{display:block;width:100%;font:inherit;margin-top:5px;border:1px solid #a9bdcc;border-radius:9px;padding:10px;background:white;color:#172943}
+button{background:#126ca0;color:white;border:0;border-radius:9px;padding:12px 17px;margin-top:20px;cursor:pointer;font:inherit;font-weight:700}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #f3b02e}
+.status{display:inline-block;border-radius:20px;padding:3px 11px;font-weight:750;background:#deedf9}.danger{background:#ffdfde;color:#7c211c}.human{background:#fff1c8;color:#644200}.good{background:#daf2e4;color:#164e32}
+pre{font:14px/1.6 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f7fb;padding:15px;border-radius:9px}
+.small{font-size:.91rem;color:#456074}.full{grid-column:1/-1}@media(max-width:750px){main{grid-template-columns:1fr}}
+</style>
+<header><div class="small" style="color:#b7dff4">KATHERINE PERRON · PORTFOLIO CASE STUDY</div><h1>Customer Operations Simulator</h1><p>Fictional service desk · Policy-driven intake, safe handoff and explainable decisions</p></header>
+<main>
+<section class="card"><h2>Simulate an incoming request</h2><p class="small">All interactions are local. No call is made and no details are transmitted.</p>
+<label for="type">Customer need</label><select id="type"><option value="book">Book a routine appointment</option><option value="quote">Request a cost estimate</option><option value="person">Speak with a person</option><option value="danger">Gas smell / immediate danger</option><option value="urgent">Burst pipe / urgent property damage</option></select>
+<label for="name">Fictional customer name</label><input id="name" value="Jordan Lee" maxlength="70">
+<label for="area">Service area</label><select id="area"><option value="inside">Inside our fictional service area</option><option value="outside">Outside service area</option></select>
+<label for="slot">Requested time</label><select id="slot"><option value="morning">Tomorrow morning</option><option value="afternoon">Tomorrow afternoon</option></select>
+<button id="run">Evaluate request</button></section>
+<section class="card" aria-live="polite"><h2>Decision and customer response</h2><p id="badge" class="status">Awaiting request</p><p id="reply">Choose a situation and evaluate it.</p><h3>Work ticket</h3><pre id="ticket">No ticket yet.</pre></section>
+<section class="card full"><h2>What this demonstrates</h2><p>Requirements and guardrails: dangerous conditions receive a short safety instruction, cost estimates never become invented prices, human requests are honored, and appointments are never claimed as booked without a real scheduling confirmation.</p><p class="small"><strong>Scope:</strong> This is a deterministic educational simulation—not a live voice agent, CRM, appointment service, or copy of SheerForce production code. All names and businesses are fictional.</p></section>
+</main>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+function assess(x){
+ const base={customer:x.name.trim()||"Unspecified",request:x.type,serviceArea:x.area,requestedSlot:x.slot,appointmentConfirmed:false};
+ if(x.type==="danger")return {state:"SAFETY ESCALATION",cls:"danger",reply:"If you smell gas or face immediate danger, leave the area and call emergency services from a safe location. I will flag the request for the on-call team.",ticket:{...base,priority:"critical",action:"safety guidance + alert on-call; no transfer delay"}};
+ if(x.type==="person")return {state:"HUMAN HANDOFF",cls:"human",reply:"I can help you reach a team member. I will pass along your request without inventing an answer.",ticket:{...base,priority:"normal",action:"request human callback"}};
+ if(x.area==="outside")return {state:"REVIEW REQUIRED",cls:"human",reply:"Your location is outside the sample coverage area. I cannot promise a visit, but I can request a staff review.",ticket:{...base,priority:x.type==="urgent"?"high":"normal",action:"staff checks coverage"}};
+ if(x.type==="urgent")return {state:"URGENT ESCALATION",cls:"human",reply:"I'm marking this urgent and notifying the on-call team. No appointment has been confirmed.",ticket:{...base,priority:"high",action:"alert on-call + seek acknowledgement"}};
+ if(x.type==="quote")return {state:"QUOTE REQUEST",cls:"good",reply:"I can record the request. A technician must review the work before providing a price.",ticket:{...base,priority:"normal",action:"collect details for estimator"}};
+ return {state:"BOOKING REQUEST",cls:"good",reply:"I can request "+x.slot+"; the scheduling system must confirm availability before this becomes an appointment.",ticket:{...base,priority:"normal",action:"availability check pending; no booking claim"}};
+}
+$("run").addEventListener("click",()=>{
+ const r=assess({type:$("type").value,name:$("name").value,area:$("area").value,slot:$("slot").value});
+ $("badge").textContent=r.state;$("badge").className="status "+r.cls;$("reply").textContent=r.reply;$("ticket").textContent=JSON.stringify(r.ticket,null,2);
+});
+</script></html>
